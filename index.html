@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitud de Crédito Vehicular</title>
+<meta name="description" content="Formulario de solicitud de crédito para la financiación de vehículos y motocicletas.">
+<!-- Favicon (Reemplaza 'favicon.png' por la ruta o URL de tu icono cuando lo tengas disponible) -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<style>
+:root{
+  --primary:#1c2e4a;
+  --primary-dark:#12203a;
+  --accent:#374387;
+  --bg:#f5f5f3;
+  --card:#ffffff;
+  --text:#1f2430;
+  --muted:#6b7178;
+  --border:#d8dade;
+  --error:#9c2b26;
+  --radius:4px;
+  --shadow:0 2px 10px rgba(20,25,40,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Georgia','Times New Roman',serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.55;
+  min-height:100vh;
+}
+input, select, button, .checkbox-field label{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
+.wrapper{max-width:560px;margin:0 auto;padding:32px 16px 60px}
+.hero{text-align:center;padding:8px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.hero .badge{
+  display:inline-block;color:var(--accent);
+  font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+  font-size:11px;font-weight:700;padding:0;border:none;
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;
+}
+.hero h1{font-size:29px;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:.2px}
+.hero p{color:var(--muted);font-size:14px;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;max-width:420px;margin:0 auto}
+.hero .highlight{color:var(--primary);font-style:italic}
+
+.banks-section{margin-bottom:28px}
+.banks-title{
+  text-align:center;font-size:12px;font-weight:700;color:var(--primary);
+  text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;
+  font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+.banks-grid{
+  display:grid;grid-template-columns:repeat(3, 1fr);gap:16px;
+  align-items:center;justify-items:center;
+}
+.banks-grid img{max-width:100%;max-height:48px;width:auto;object-fit:contain}
+@media(max-width:400px){
+  .banks-grid{grid-template-columns:repeat(2, 1fr)}
+}
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:30px 26px;
+  border:1px solid var(--border);
+  font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+.section-title{
+  font-size:12px;font-weight:700;color:var(--primary);
+  text-transform:uppercase;letter-spacing:1px;
+  margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.section-title:first-child{margin-top:0}
+.field{margin-bottom:14px}
+.field label{
+  display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;
+}
+.field .req{color:var(--error)}
+.row{display:flex;gap:10px}
+.row .field{flex:1;min-width:0}
+input:not([type="checkbox"]):not([type="radio"]), select{
+  width:100%;padding:11px 13px;font-size:14.5px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:#fdfdfc;color:var(--text);
+  transition:border-color .15s;
+  appearance:none;
+}
+select{background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7178'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:34px}
+input:focus, select:focus{outline:none;border-color:var(--primary)}
+input.invalid, select.invalid{border-color:var(--error)}
+.err-msg{display:none;color:var(--error);font-size:12px;margin-top:5px;font-weight:400}
+.field.has-error .err-msg{display:block}
+
+.vehicle-toggle{display:flex;gap:10px}
+.vehicle-toggle input{display:none}
+.vehicle-toggle label{
+  flex:1;text-align:center;padding:13px 8px;border:1px solid var(--border);
+  border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:13.5px;color:var(--muted);
+  letter-spacing:.3px;text-transform:uppercase;
+  transition:all .15s;background:#fdfdfc;
+}
+.vehicle-toggle input:checked + label{
+  border-color:var(--primary);background:var(--primary);color:#fff;
+}
+
+.checkbox-field{display:flex;align-items:flex-start;gap:10px;margin:18px 0 6px}
+.checkbox-field input{width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:var(--primary)}
+.checkbox-field label{font-size:12.5px;color:var(--muted);font-weight:400;line-height:1.5}
+.checkbox-field a{color:var(--primary);text-decoration:underline}
+
+button#submitBtn{
+  width:100%;padding:14px;margin-top:10px;
+  background:var(--primary);
+  color:#fff;border:1px solid var(--primary);border-radius:var(--radius);
+  font-size:14.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;
+  transition:background-color .15s;
+}
+button#submitBtn:hover{background:var(--primary-dark)}
+button#submitBtn:disabled{opacity:.6;cursor:not-allowed}
+
+.trust{display:flex;justify-content:center;gap:0;margin-top:20px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:16px}
+.trust span{font-size:11px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;padding:0 12px;border-right:1px solid var(--border)}
+.trust span:last-child{border-right:none}
+
+.form-status{
+  display:none;text-align:center;padding:11px;border-radius:var(--radius);font-size:13px;
+  font-weight:600;margin-top:14px;border:1px solid transparent;
+}
+.form-status.error{display:block;background:#f8ecec;color:var(--error);border-color:#e6c9c7}
+
+footer{text-align:center;margin-top:30px;color:var(--muted);font-size:11.5px;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;letter-spacing:.3px}
+
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(20,25,40,.55);
+  align-items:center;justify-content:center;padding:20px;z-index:999;
+}
+.modal-overlay.show{display:flex}
+.modal-box{
+  background:var(--card);border-radius:var(--radius);max-width:380px;width:100%;
+  padding:28px 24px;text-align:center;font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+  box-shadow:0 10px 40px rgba(0,0,0,.2);
+}
+.modal-box .modal-icon{font-size:32px;margin-bottom:12px}
+.modal-box.approved .modal-icon{color:#2f7d4f}
+.modal-box.rejected .modal-icon{color:var(--accent)}
+.modal-box h3{font-size:17px;color:var(--text);margin-bottom:10px;line-height:1.4}
+.modal-box p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.modal-box button{
+  width:100%;padding:12px;background:var(--primary);color:#fff;border:none;
+  border-radius:var(--radius);font-size:13.5px;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;cursor:pointer;transition:background-color .15s;
+}
+.modal-box button:hover{background:var(--primary-dark)}
+
+@media(max-width:400px){
+  .hero h1{font-size:21px}
+  .card{padding:22px 18px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="hero">
+    <span class="badge">Financiación Vehicular</span>
+    <h1>Solicitud de Crédito para Vehículo</h1>
+    <p>Complete el siguiente formulario y un asesor especializado se pondrá en contacto con usted a la brevedad.</p>
+    <div style="margin-top:14px">
+      <a href="solicitud-detallada.html" style="display:inline-block;padding:9px 16px;background:var(--accent);color:#fff;text-decoration:none;border-radius:var(--radius);font-family:'Segoe UI',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.3px">¿El asesor te ya revisó tus datos? Ir a Solicitud Detallada →</a>
+    </div>
+  </div>
+
+  <div class="banks-section">
+    <div class="banks-title">Bancos Aliados</div>
+    <div class="banks-grid">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Banco_de_Bogot%C3%A1_logo_%282%29.svg/1920px-Banco_de_Bogot%C3%A1_logo_%282%29.svg.png" alt="Banco 1">
+      <img src="https://www.finesa.com.co/media/logo_finesa_vehiculos.png" alt="Banco 2">
+      <img src="https://static.wikia.nocookie.net/logopedia/images/8/8b/Banco_Finandina_2018.svg/revision/latest/scale-to-width-down/300?cb=20211026211423" alt="Banco 3">
+      <img src="https://vehigrupo.com/images/logomain.png" alt="Banco 4">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/32/BBVA_2025.png" alt="Banco 5">
+      <img src="https://www.finanzauto.com.co/portal/assets/finanzauto-logo-DUFF8JTn.png" alt="Banco 6">
+    </div>
+  </div>
+
+  <form class="card" id="creditForm" novalidate>
+
+    <div class="section-title">Datos Personales</div>
+
+    <div class="field">
+      <label for="nombre">Nombre Completo <span class="req">*</span></label>
+      <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez Gómez" required minlength="4">
+      <span class="err-msg">Ingresa tu nombre completo (mín. 4 caracteres).</span>
+    </div>
+
+    <div class="row">
+      <div class="field" style="max-width:130px">
+        <label for="tipoDoc">Documento <span class="req">*</span></label>
+        <select id="tipoDoc" name="tipoDoc" required>
+          <option value="CC">C.C.</option>
+          <option value="CE">C.E.</option>
+          <option value="PA">Pasaporte</option>
+          <option value="NIT">NIT</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="numDoc">Número <span class="req">*</span></label>
+        <input type="text" id="numDoc" name="numDoc" placeholder="1234567890" required minlength="5" inputmode="numeric">
+        <span class="err-msg">Número de documento inválido.</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="telefono">Teléfono / WhatsApp <span class="req">*</span></label>
+      <input type="tel" id="telefono" name="telefono" placeholder="3001234567" required pattern="[0-9]{7,15}" inputmode="tel">
+      <span class="err-msg">Ingresa un número válido (solo dígitos).</span>
+    </div>
+
+    <div class="field">
+      <label for="email">Correo Electrónico <span class="req">*</span></label>
+      <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
+      <span class="err-msg">Ingresa un correo electrónico válido.</span>
+    </div>
+
+    <div class="field">
+      <label for="edad">Edad <span class="req">*</span></label>
+      <input type="number" id="edad" name="edad" placeholder="30" required min="18" max="99" step="1" inputmode="numeric">
+      <span class="err-msg">Debes ser mayor o igual a 18 años.</span>
+    </div>
+
+    <div class="section-title">Datos del Vehículo</div>
+
+    <div class="field">
+      <label>Tipo de Vehículo <span class="req">*</span></label>
+      <div class="vehicle-toggle">
+        <input type="radio" id="vehCarro" name="vehiculo" value="Carro" checked>
+        <label for="vehCarro">Automóvil</label>
+        <input type="radio" id="vehMoto" name="vehiculo" value="Moto">
+        <label for="vehMoto">Motocicleta</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="monto">Valor del Vehículo / Monto a Financiar (COP) <span class="req">*</span></label>
+      <input type="number" id="monto" name="monto" placeholder="30000000" required min="1000000" step="100000">
+      <span class="err-msg">Ingresa un monto válido (mín. $1.000.000).</span>
+    </div>
+
+    <div class="section-title">Información Financiera</div>
+
+    <div class="field">
+      <label for="ocupacion">Ocupación <span class="req">*</span></label>
+      <select id="ocupacion" name="ocupacion" required>
+        <option value="">Selecciona una opción</option>
+        <option value="Empleado">Empleado</option>
+        <option value="Independiente">Independiente</option>
+        <option value="Pensionado">Pensionado</option>
+        <option value="Otro">Otro</option>
+      </select>
+      <span class="err-msg">Selecciona tu ocupación.</span>
+    </div>
+
+    <div class="field" id="ocupacionOtraField" style="display:none">
+      <label for="ocupacionOtra">Especifique <span class="req">*</span></label>
+      <input type="text" id="ocupacionOtra" name="ocupacionOtra" placeholder="Escriba su ocupación">
+      <span class="err-msg">Especifique su ocupación.</span>
+    </div>
+
+    <div class="field">
+      <label for="ingresos">Ingresos Mensuales Aproximados (COP) <span class="req">*</span></label>
+      <input type="number" id="ingresos" name="ingresos" placeholder="2000000" required min="500000">
+      <span class="err-msg">Ingresa un valor válido (mín. $500.000).</span>
+    </div>
+
+    <div class="field">
+      <label for="demuestraIngresos">¿Tiene manera de demostrar sus ingresos? <span class="req">*</span></label>
+      <select id="demuestraIngresos" name="demuestraIngresos" required>
+        <option value="">Selecciona una opción</option>
+        <option value="Sí">Sí</option>
+        <option value="No">No</option>
+      </select>
+      <span class="err-msg">Selecciona una opción.</span>
+    </div>
+
+    <div class="field">
+      <label for="obligaciones">¿Cuenta con obligaciones financieras? <span class="req">*</span></label>
+      <select id="obligaciones" name="obligaciones" required>
+        <option value="">Selecciona una opción</option>
+        <option value="Sí tengo y están al día">Sí tengo y están al día</option>
+        <option value="Sí tengo y están reportadas en centrales">Sí tengo y están reportadas en centrales</option>
+        <option value="No tengo">No tengo</option>
+      </select>
+      <span class="err-msg">Selecciona una opción.</span>
+    </div>
+
+    <div class="field" id="pazYSalvoField" style="display:none">
+      <label for="pazYSalvo">¿Están a Paz y Salvo? <span class="req">*</span></label>
+      <select id="pazYSalvo" name="pazYSalvo">
+        <option value="">Selecciona una opción</option>
+        <option value="Sí">Sí</option>
+        <option value="No">No</option>
+      </select>
+      <span class="err-msg">Selecciona una opción.</span>
+    </div>
+
+    <div class="checkbox-field">
+      <input type="checkbox" id="terms" name="terms" required>
+      <label for="terms">Acepto los <a href="#" target="_blank">Términos y Condiciones</a>. Autorizo el tratamiento de mis datos personales conforme a la <a href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981" target="_blank" rel="noopener">Ley 1581 de 2012</a>.</label>
+    </div>
+
+    <button type="submit" id="submitBtn">Enviar Solicitud</button>
+    <div class="form-status" id="formStatus"></div>
+
+    <div class="trust">
+      <span>Información confidencial</span>
+      <span>Sin costo de estudio</span>
+      <span>Respuesta oportuna</span>
+    </div>
+  </form>
+
+  <footer>© 2026 Créditos Vehiculares S.A.S. Todos los derechos reservados.</footer>
+</div>
+
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-box" id="resultModalBox">
+    <div class="modal-icon" id="resultModalIcon"></div>
+    <h3 id="resultModalText"></h3>
+    <p>Serás redirigido a WhatsApp para continuar la conversación con un asesor.</p>
+    <button type="button" id="resultModalBtn">Continuar a WhatsApp</button>
+  </div>
+</div>
+
+<script>
+// ==== CONFIGURACIÓN ====
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4TkISKEjjFPZNpXTw1Ebfa4VQdfSGSxZXqY_py3lszgmczXdl8RsTVTJl1bvQpoDv3A/exec";
+const WHATSAPP_NUMBER = "573182754224"; // formato: 57300XXXXXXX (sin +, sin espacios)
+
+const form = document.getElementById('creditForm');
+const submitBtn = document.getElementById('submitBtn');
+const formStatus = document.getElementById('formStatus');
+
+// Validación en tiempo real por campo
+function validateField(field){
+  const wrapper = field.closest('.field');
+  if(!wrapper) return field.checkValidity();
+  const valid = field.checkValidity();
+  wrapper.classList.toggle('has-error', !valid);
+  field.classList.toggle('invalid', !valid);
+  return valid;
+}
+
+form.querySelectorAll('input, select').forEach(el=>{
+  el.addEventListener('blur', ()=> validateField(el));
+  el.addEventListener('input', ()=>{ if(el.classList.contains('invalid')) validateField(el); });
+});
+
+// Mostrar/ocultar campo "Especifique" cuando Ocupación = Otro
+const ocupacionSelect = document.getElementById('ocupacion');
+const ocupacionOtraField = document.getElementById('ocupacionOtraField');
+const ocupacionOtraInput = document.getElementById('ocupacionOtra');
+
+ocupacionSelect.addEventListener('change', ()=>{
+  const mostrar = ocupacionSelect.value === 'Otro';
+  ocupacionOtraField.style.display = mostrar ? 'block' : 'none';
+  ocupacionOtraInput.required = mostrar;
+  if(!mostrar){
+    ocupacionOtraInput.value = '';
+    ocupacionOtraField.classList.remove('has-error');
+    ocupacionOtraInput.classList.remove('invalid');
+  }
+});
+
+// Mostrar/ocultar pregunta condicional "¿Están a Paz y Salvo?"
+const obligacionesSelect = document.getElementById('obligaciones');
+const pazYSalvoField = document.getElementById('pazYSalvoField');
+const pazYSalvoSelect = document.getElementById('pazYSalvo');
+
+obligacionesSelect.addEventListener('change', ()=>{
+  const mostrar = obligacionesSelect.value === 'Sí tengo y están reportadas en centrales';
+  pazYSalvoField.style.display = mostrar ? 'block' : 'none';
+  pazYSalvoSelect.required = mostrar;
+  if(!mostrar){
+    pazYSalvoSelect.value = '';
+    pazYSalvoField.classList.remove('has-error');
+    pazYSalvoSelect.classList.remove('invalid');
+  }
+});
+
+function formatCOP(num){
+  return '$' + Number(num).toLocaleString('es-CO');
+}
+
+form.addEventListener('submit', async function(e){
+  e.preventDefault();
+  formStatus.style.display = 'none';
+
+  // Validar todos los campos
+  let allValid = true;
+  form.querySelectorAll('input, select').forEach(el=>{
+    if(!validateField(el)) allValid = false;
+  });
+  if(!form.terms.checked){
+    allValid = false;
+    formStatus.className = 'form-status error';
+    formStatus.textContent = 'Debes aceptar los términos y el tratamiento de datos.';
+    formStatus.style.display = 'block';
+  }
+  if(!allValid){
+    const firstError = form.querySelector('.invalid, .has-error input, .has-error select');
+    if(firstError) firstError.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+
+  // Recolectar datos
+  const data = {
+    nombre: form.nombre.value.trim(),
+    tipoDoc: form.tipoDoc.value,
+    numDoc: form.numDoc.value.trim(),
+    telefono: form.telefono.value.trim(),
+    email: form.email.value.trim(),
+    edad: form.edad.value,
+    vehiculo: form.vehiculo.value,
+    monto: form.monto.value,
+    ocupacion: form.ocupacion.value === 'Otro' ? `Otro (${form.ocupacionOtra.value.trim()})` : form.ocupacion.value,
+    ingresos: form.ingresos.value,
+    demuestraIngresos: form.demuestraIngresos.value,
+    obligaciones: form.obligaciones.value,
+    pazYSalvo: form.pazYSalvo.value || 'N/A',
+    fecha: new Date().toISOString()
+  };
+
+  // Estado "Enviando..."
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
+
+  try{
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Apps Script no responde CORS estándar; envío "fire and forget"
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(data)
+    });
+  }catch(err){
+    console.error('Error al enviar a Sheets:', err);
+    // Continúa igual hacia WhatsApp para no perder el lead
+  }
+
+  // Evaluar requisitos mínimos de financiación
+  const cumpleIngresos = Number(data.ingresos) > 2700000;
+  const cumpleDemuestraIngresos = data.demuestraIngresos === 'Sí';
+  const cumpleRequisitos = cumpleIngresos && cumpleDemuestraIngresos;
+
+  const mensajeAprobado = `Hola, me llamo ${data.nombre}, he validado que soy apt@ para acceder al crédito vehicular y quiero seguir adelante con la solicitud.`;
+  const mensajeNoAprobado = `Hola, soy ${data.nombre}, mi evaluación de viabilidad para el crédito vehicular no fue favorable, pero deseo explorar otras opciones que se ajusten a mi perfil.`;
+
+  const mensaje = cumpleRequisitos ? mensajeAprobado : mensajeNoAprobado;
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+
+  // Mostrar ventana de resultado
+  const modal = document.getElementById('resultModal');
+  const modalBox = document.getElementById('resultModalBox');
+  const modalIcon = document.getElementById('resultModalIcon');
+  const modalText = document.getElementById('resultModalText');
+  const modalBtn = document.getElementById('resultModalBtn');
+
+  modalBox.className = 'modal-box ' + (cumpleRequisitos ? 'approved' : 'rejected');
+  modalIcon.textContent = cumpleRequisitos ? '✓' : '!';
+  modalText.textContent = cumpleRequisitos
+    ? 'Cumples con los requisitos mínimos de financiación'
+    : 'Aunque no cumples con los requisitos para financiación, aún lo puedes hacer por otros medios';
+
+  submitBtn.textContent = 'Enviar Solicitud';
+  submitBtn.disabled = false;
+  modal.classList.add('show');
+
+  const irAWhatsapp = ()=>{ window.location.href = waUrl; };
+  modalBtn.onclick = irAWhatsapp;
+
+  // Redirección automática de respaldo
+  setTimeout(irAWhatsapp, 4000);
+});
+</script>
+</body>
+</html>

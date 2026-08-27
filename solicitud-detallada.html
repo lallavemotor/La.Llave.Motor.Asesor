@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitud Detallada de Crédito Vehicular - Bancos</title>
+<meta name="description" content="Formulario bancario detallado para aprobación de crédito vehicular con firma digital autorizada.">
+<!-- Favicon (Reemplaza 'favicon.png' por la ruta o URL de tu icono cuando lo tengas disponible) -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<!-- jsPDF library CDN para generación del documento PDF firmado -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --primary:#1c2e4a;
+  --primary-dark:#12203a;
+  --accent:#374387;
+  --bg:#f5f5f3;
+  --card:#ffffff;
+  --text:#1f2430;
+  --muted:#6b7178;
+  --border:#d8dade;
+  --error:#9c2b26;
+  --success:#2f7d4f;
+  --radius:4px;
+  --shadow:0 2px 10px rgba(20,25,40,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Georgia','Times New Roman',serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.55;
+  min-height:100vh;
+}
+input, select, button, textarea, .checkbox-field label{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
+.wrapper{max-width:720px;margin:0 auto;padding:24px 16px 60px}
+
+.header-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.back-link{color:var(--accent);text-decoration:none;font-size:13.5px;font-family:'Segoe UI',sans-serif;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.back-link:hover{text-decoration:underline}
+
+.hero{text-align:center;padding:12px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.hero .badge{
+  display:inline-block;color:var(--accent);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  font-size:11px;font-weight:700;padding:0;border:none;
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;
+}
+.hero h1{font-size:26px;font-weight:700;color:var(--text);margin-bottom:8px}
+.hero p{color:var(--muted);font-size:13.5px;font-family:'Segoe UI',sans-serif;max-width:540px;margin:0 auto}
+
+/* Módulo de Búsqueda por Documento */
+.search-card{
+  background:#ebf1f8;
+  border:1px solid #c0d3e8;
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:24px;
+  font-family:'Segoe UI',sans-serif;
+}
+.search-card h2{font-size:14px;font-weight:700;color:var(--primary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.search-card p{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.search-box{display:flex;gap:10px}
+.search-box input{flex:1}
+.search-box button{
+  background:var(--primary);color:#fff;border:none;padding:10px 18px;
+  border-radius:var(--radius);font-weight:600;font-size:13px;cursor:pointer;
+  white-space:nowrap;transition:background-color .15s;
+}
+.search-box button:hover{background:var(--primary-dark)}
+.search-feedback{display:none;margin-top:10px;font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:var(--radius)}
+.search-feedback.success{display:block;background:#e2f2e6;color:var(--success);border:1px solid #bce3c5}
+.search-feedback.error{display:block;background:#f8ecec;color:var(--error);border:1px solid #e6c9c7}
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:28px 24px;
+  border:1px solid var(--border);
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+.section-title{
+  font-size:13px;font-weight:700;color:var(--primary);
+  text-transform:uppercase;letter-spacing:1px;
+  margin:28px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--primary);
+  display:flex;align-items:center;gap:8px;
+}
+.section-title:first-child{margin-top:0}
+.section-number{
+  background:var(--primary);color:#fff;font-size:11px;width:20px;height:20px;
+  border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+}
+
+.field{margin-bottom:14px}
+.field label{
+  display:block;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:5px;
+}
+.field .req{color:var(--error)}
+.row{display:flex;gap:12px}
+.row .field{flex:1;min-width:0}
+
+input:not([type="checkbox"]):not([type="radio"]), select, textarea{
+  width:100%;padding:10px 12px;font-size:14px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:#fdfdfc;color:var(--text);
+  transition:border-color .15s;
+  appearance:none;
+}
+select{background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7178'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:34px}
+input:focus, select:focus, textarea:focus{outline:none;border-color:var(--primary)}
+input.invalid, select.invalid, textarea.invalid{border-color:var(--error)}
+.err-msg{display:none;color:var(--error);font-size:11.5px;margin-top:4px}
+.field.has-error .err-msg{display:block}
+
+.vehicle-toggle{display:flex;gap:10px}
+.vehicle-toggle input{display:none}
+.vehicle-toggle label{
+  flex:1;text-align:center;padding:11px 8px;border:1px solid var(--border);
+  border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);
+  letter-spacing:.3px;text-transform:uppercase;
+  transition:all .15s;background:#fdfdfc;
+}
+.vehicle-toggle input:checked + label{
+  border-color:var(--primary);background:var(--primary);color:#fff;
+}
+
+/* Ley 1581 y Canvas de Firma */
+.ley-box{
+  background:#f9f9f8;border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;font-size:11.5px;color:var(--muted);line-height:1.45;margin-bottom:16px;
+  max-height:120px;overflow-y:auto;
+}
+.signature-container{
+  border:2px dashed var(--border);border-radius:var(--radius);
+  background:#fff;text-align:center;position:relative;margin-bottom:12px;
+}
+.signature-container.has-error{border-color:var(--error)}
+canvas#sigCanvas{
+  width:100%;height:160px;touch-action:none;cursor:crosshair;display:block;
+}
+.signature-tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.signature-tools button{
+  background:none;border:1px solid var(--border);padding:6px 12px;font-size:12px;
+  border-radius:var(--radius);cursor:pointer;color:var(--text);font-weight:600;
+}
+.signature-tools button:hover{background:#eee}
+.btn-pdf-preview{
+  background:#2f7d4f !important;color:#fff !important;border:none !important;
+}
+.btn-pdf-preview:hover{background:#23613c !important}
+
+button#submitBtn{
+  width:100%;padding:15px;margin-top:14px;
+  background:var(--primary);
+  color:#fff;border:1px solid var(--primary);border-radius:var(--radius);
+  font-size:14.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;
+  transition:background-color .15s;
+}
+button#submitBtn:hover{background:var(--primary-dark)}
+button#submitBtn:disabled{opacity:.6;cursor:not-allowed}
+
+.form-status{
+  display:none;text-align:center;padding:11px;border-radius:var(--radius);font-size:13px;
+  font-weight:600;margin-top:14px;border:1px solid transparent;
+}
+.form-status.error{display:block;background:#f8ecec;color:var(--error);border-color:#e6c9c7}
+
+footer{text-align:center;margin-top:30px;color:var(--muted);font-size:11.5px;font-family:'Segoe UI',sans-serif}
+
+/* Modal */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(20,25,40,.55);
+  align-items:center;justify-content:center;padding:20px;z-index:999;
+}
+.modal-overlay.show{display:flex}
+.modal-box{
+  background:var(--card);border-radius:var(--radius);max-width:440px;width:100%;
+  padding:28px 24px;text-align:center;font-family:'Segoe UI',sans-serif;
+  box-shadow:0 10px 40px rgba(0,0,0,.2);
+}
+.modal-box .modal-icon{font-size:36px;color:var(--success);margin-bottom:10px}
+.modal-box h3{font-size:18px;color:var(--text);margin-bottom:10px}
+.modal-box p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.modal-actions{display:flex;flex-direction:column;gap:10px}
+.modal-actions button{
+  padding:12px;border-radius:var(--radius);font-size:13px;font-weight:700;
+  cursor:pointer;border:none;text-transform:uppercase;letter-spacing:.4px;
+}
+.btn-whatsapp{background:#25d366;color:#fff}
+.btn-whatsapp:hover{background:#1eb856}
+.btn-download-pdf{background:var(--primary);color:#fff}
+.btn-download-pdf:hover{background:var(--primary-dark)}
+
+@media(max-width:550px){
+  .row{flex-direction:column;gap:0}
+  .search-box{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="header-nav">
+    <a href="index.html" class="back-link">← Volver al inicio</a>
+    <span style="font-size:11.5px;color:var(--muted);font-family:'Segoe UI',sans-serif">Solicitud Crédito Banco</span>
+  </div>
+
+  <div class="hero">
+    <span class="badge">Formulario Detallado Bancario</span>
+    <h1>Solicitud Completa de Crédito Vehicular</h1>
+    <p>Diligencie la información requerida por las entidades financieras para la evaluación y aprobación de su crédito.</p>
+  </div>
+
+  <!-- Módulo de Búsqueda por Documento para Autocompletado -->
+  <div class="search-card">
+    <h2>¿Ya llenaste el formulario inicial?</h2>
+    <p>Ingresa tu número de documento para autocompletar automáticamente tus datos previamente registrados.</p>
+    <div class="search-box">
+      <input type="text" id="searchNumDoc" placeholder="Número de Documento (Ej: 1018234567)" inputmode="numeric">
+      <button type="button" id="btnBuscarDoc">Cargar mis datos</button>
+    </div>
+    <div class="search-feedback" id="searchFeedback"></div>
+  </div>
+
+  <form class="card" id="detailedCreditForm" novalidate>
+
+    <!-- SECCIÓN 1: IDENTIFICACIÓN Y DATOS PERSONALES -->
+    <div class="section-title">
+      <span class="section-number">1</span>
+      Datos Personales y Expedición
+    </div>
+
+    <div class="row">
+      <div class="field" style="max-width:130px">
+        <label for="tipoDoc">Tipo Doc <span class="req">*</span></label>
+        <select id="tipoDoc" name="tipoDoc" required>
+          <option value="CC">C.C.</option>
+          <option value="CE">C.E.</option>
+          <option value="PA">Pasaporte</option>
+          <option value="NIT">NIT</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="numDoc">Número de Documento <span class="req">*</span></label>
+        <input type="text" id="numDoc" name="numDoc" placeholder="1234567890" required minlength="5" inputmode="numeric">
+        <span class="err-msg">Documento obligatorio (mín. 5 dígitos).</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="nombre">Nombre Completo <span class="req">*</span></label>
+      <input type="text" id="nombre" name="nombre" placeholder="Nombre completo según documento" required minlength="4">
+      <span class="err-msg">Ingresa tu nombre completo.</span>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="fechaExpDoc">Fecha Expedición Documento <span class="req">*</span></label>
+        <input type="date" id="fechaExpDoc" name="fechaExpDoc" required>
+        <span class="err-msg">Selecciona la fecha de expedición.</span>
+      </div>
+      <div class="field">
+        <label for="lugarExpDoc">Lugar de Expedición <span class="req">*</span></label>
+        <input type="text" id="lugarExpDoc" name="lugarExpDoc" placeholder="Ej: Bogotá, D.C." required>
+        <span class="err-msg">Ingresa la ciudad de expedición.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="fechaNacimiento">Fecha de Nacimiento <span class="req">*</span></label>
+        <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+        <span class="err-msg">Ingresa tu fecha de nacimiento.</span>
+      </div>
+      <div class="field" style="max-width:100px">
+        <label for="edad">Edad <span class="req">*</span></label>
+        <input type="number" id="edad" name="edad" placeholder="30" required min="18" max="99" inputmode="numeric">
+        <span class="err-msg">Mín. 18.</span>
+      </div>
+      <div class="field">
+        <label for="estadoCivil">Estado Civil <span class="req">*</span></label>
+        <select id="estadoCivil" name="estadoCivil" required>
+          <option value="">Selecciona</option>
+          <option value="Soltero/a">Soltero/a</option>
+          <option value="Casado/a">Casado/a</option>
+          <option value="Unión Libre">Unión Libre</option>
+          <option value="Divorciado/a">Divorciado/a</option>
+          <option value="Viudo/a">Viudo/a</option>
+        </select>
+        <span class="err-msg">Selecciona estado civil.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="nivelEstudios">Nivel de Estudios <span class="req">*</span></label>
+        <select id="nivelEstudios" name="nivelEstudios" required>
+          <option value="">Selecciona</option>
+          <option value="Bachiller">Bachiller</option>
+          <option value="Técnico/Tecnólogo">Técnico / Tecnólogo</option>
+          <option value="Profesional">Profesional</option>
+          <option value="Posgrado/Maestría">Posgrado / Maestría</option>
+          <option value="Otro">Otro</option>
+        </select>
+        <span class="err-msg">Selecciona nivel educativo.</span>
+      </div>
+      <div class="field">
+        <label for="personasACargo">Personas a Cargo <span class="req">*</span></label>
+        <select id="personasACargo" name="personasACargo" required>
+          <option value="0">0 (Ninguna)</option>
+          <option value="1">1 persona</option>
+          <option value="2">2 personas</option>
+          <option value="3">3 personas</option>
+          <option value="4+">4 o más personas</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: UBICACIÓN Y RESIDENCIA -->
+    <div class="section-title">
+      <span class="section-number">2</span>
+      Ubicación y Vivienda
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="telefono">Teléfono / WhatsApp <span class="req">*</span></label>
+        <input type="tel" id="telefono" name="telefono" placeholder="3001234567" required pattern="[0-9]{7,15}" inputmode="tel">
+        <span class="err-msg">Teléfono válido (solo dígitos).</span>
+      </div>
+      <div class="field">
+        <label for="email">Correo Electrónico <span class="req">*</span></label>
+        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
+        <span class="err-msg">Correo válido.</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="direccionResidencia">Dirección de Residencia <span class="req">*</span></label>
+      <input type="text" id="direccionResidencia" name="direccionResidencia" placeholder="Ej: Cra 15 # 45 - 20 Apt 301" required>
+      <span class="err-msg">Ingresa tu dirección de residencia.</span>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="ciudad">Ciudad / Municipio <span class="req">*</span></label>
+        <input type="text" id="ciudad" name="ciudad" placeholder="Ej: Medellín" required>
+        <span class="err-msg">Ingresa la ciudad.</span>
+      </div>
+      <div class="field">
+        <label for="departamento">Departamento <span class="req">*</span></label>
+        <input type="text" id="departamento" name="departamento" placeholder="Ej: Antioquia" required>
+        <span class="err-msg">Ingresa el departamento.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="tipoVivienda">Tipo de Vivienda <span class="req">*</span></label>
+        <select id="tipoVivienda" name="tipoVivienda" required>
+          <option value="">Selecciona</option>
+          <option value="Propia sin hipoteca">Propia (Sin hipoteca)</option>
+          <option value="Propia con hipoteca">Propia (Con hipoteca)</option>
+          <option value="Arrendada">Arrendada</option>
+          <option value="Familiar">Familiar</option>
+        </select>
+        <span class="err-msg">Selecciona tipo de vivienda.</span>
+      </div>
+      <div class="field">
+        <label for="tiempoResidencia">Antigüedad en la Vivienda <span class="req">*</span></label>
+        <select id="tiempoResidencia" name="tiempoResidencia" required>
+          <option value="Menos de 1 año">Menos de 1 año</option>
+          <option value="1 a 3 años">1 a 3 años</option>
+          <option value="3 a 5 años">3 a 5 años</option>
+          <option value="Más de 5 años">Más de 5 años</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="valorViviendaCanon">Canon Arriendo / Hipoteca (COP)</label>
+        <input type="number" id="valorViviendaCanon" name="valorViviendaCanon" placeholder="0 si es propia o familiar" min="0" step="50000">
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: INFORMACIÓN LABORAL Y FINANCIERA -->
+    <div class="section-title">
+      <span class="section-number">3</span>
+      Información Laboral y Financiera
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="tipoContrato">Tipo de Contrato / Ocupación <span class="req">*</span></label>
+        <select id="tipoContrato" name="tipoContrato" required>
+          <option value="">Selecciona una opción</option>
+          <option value="Término Indefinido">Empleado (Término Indefinido)</option>
+          <option value="Término Fijo">Empleado (Término Fijo / Obra)</option>
+          <option value="Prestación de Servicios">Prestación de Servicios</option>
+          <option value="Independiente / Comerciante">Independiente / Comerciante</option>
+          <option value="Pensionado">Pensionado</option>
+          <option value="Socio / Empresario">Socio / Empresario</option>
+        </select>
+        <span class="err-msg">Selecciona tu tipo de contrato u ocupación.</span>
+      </div>
+      <div class="field">
+        <label for="empresa">Nombre de la Empresa / Negocio <span class="req">*</span></label>
+        <input type="text" id="empresa" name="empresa" placeholder="Empresa o Razón Social" required>
+        <span class="err-msg">Ingresa el nombre de la empresa o negocio.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="cargo">Cargo / Actividad Económica <span class="req">*</span></label>
+        <input type="text" id="cargo" name="cargo" placeholder="Ej: Analista de Sistemas / Comercio" required>
+        <span class="err-msg">Ingresa tu cargo o actividad.</span>
+      </div>
+      <div class="field">
+        <label for="fechaVinculacion">Fecha de Vinculación Laboral <span class="req">*</span></label>
+        <input type="date" id="fechaVinculacion" name="fechaVinculacion" required>
+        <span class="err-msg">Selecciona la fecha de vinculación.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="telefonoEmpresa">Teléfono Empresa / Oficina <span class="req">*</span></label>
+        <input type="tel" id="telefonoEmpresa" name="telefonoEmpresa" placeholder="6012345678" required pattern="[0-9]{7,15}">
+        <span class="err-msg">Teléfono de empresa válido.</span>
+      </div>
+      <div class="field">
+        <label for="direccionEmpresa">Dirección Empresa / Oficina</label>
+        <input type="text" id="direccionEmpresa" name="direccionEmpresa" placeholder="Ej: Cl. 72 # 10 - 34">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="ingresos">Sueldo / Ingreso Básico Mensual (COP) <span class="req">*</span></label>
+        <input type="number" id="ingresos" name="ingresos" placeholder="3000000" required min="500000">
+        <span class="err-msg">Ingresa tus ingresos básicos (mín. $500.000).</span>
+      </div>
+      <div class="field">
+        <label for="otrosIngresos">Otros Ingresos Mensuales (COP)</label>
+        <input type="number" id="otrosIngresos" name="otrosIngresos" placeholder="0" min="0">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="conceptoOtrosIngresos">Concepto de Otros Ingresos</label>
+        <input type="text" id="conceptoOtrosIngresos" name="conceptoOtrosIngresos" placeholder="Ej: Arriendos, comisiones, honorarios">
+      </div>
+      <div class="field">
+        <label for="egresos">Gastos / Egresos Mensuales (COP) <span class="req">*</span></label>
+        <input type="number" id="egresos" name="egresos" placeholder="1200000" required min="100000">
+        <span class="err-msg">Ingresa un valor aproximado de tus gastos.</span>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: VEHÍCULO A FINANCIAR -->
+    <div class="section-title">
+      <span class="section-number">4</span>
+      Datos del Vehículo
+    </div>
+
+    <div class="field">
+      <label>Tipo de Vehículo <span class="req">*</span></label>
+      <div class="vehicle-toggle">
+        <input type="radio" id="vehCarro" name="vehiculo" value="Carro" checked>
+        <label for="vehCarro">Automóvil</label>
+        <input type="radio" id="vehMoto" name="vehiculo" value="Moto">
+        <label for="vehMoto">Motocicleta</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="estadoVehiculo">Estado del Vehículo <span class="req">*</span></label>
+        <select id="estadoVehiculo" name="estadoVehiculo" required>
+          <option value="Nuevo">Nuevo (0 Km)</option>
+          <option value="Usado">Usado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="marcaVehiculo">Marca <span class="req">*</span></label>
+        <input type="text" id="marcaVehiculo" name="marcaVehiculo" placeholder="Ej: Toyota, Chevrolet, Yamaha" required>
+        <span class="err-msg">Ingresa la marca del vehículo.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="lineaVehiculo">Línea / Referencia <span class="req">*</span></label>
+        <input type="text" id="lineaVehiculo" name="lineaVehiculo" placeholder="Ej: Onix Turbo / NMAX 155" required>
+        <span class="err-msg">Ingresa la línea o modelo.</span>
+      </div>
+      <div class="field" style="max-width:130px">
+        <label for="modeloVehiculo">Año Modelo <span class="req">*</span></label>
+        <input type="number" id="modeloVehiculo" name="modeloVehiculo" placeholder="2024" min="2000" max="2027" required>
+        <span class="err-msg">Año modelo.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="monto">Valor Total Vehículo / Monto Solicitado (COP) <span class="req">*</span></label>
+        <input type="number" id="monto" name="monto" placeholder="45000000" required min="1000000">
+        <span class="err-msg">Monto requerido (mín. $1.000.000).</span>
+      </div>
+      <div class="field">
+        <label for="cuotaInicial">Cuota Inicial Disponible (COP)</label>
+        <input type="number" id="cuotaInicial" name="cuotaInicial" placeholder="10000000" min="0">
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: REFERENCIAS -->
+    <div class="section-title">
+      <span class="section-number">5</span>
+      Referencias Requeridas
+    </div>
+
+    <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px"><b>Referencia 1: Familiar que NO conviva con usted</b></p>
+    <div class="row">
+      <div class="field">
+        <label for="refFamNombre">Nombre Completo <span class="req">*</span></label>
+        <input type="text" id="refFamNombre" name="refFamNombre" placeholder="Nombre de familiar" required>
+        <span class="err-msg">Obligatorio.</span>
+      </div>
+      <div class="field">
+        <label for="refFamParentesco">Parentesco <span class="req">*</span></label>
+        <input type="text" id="refFamParentesco" name="refFamParentesco" placeholder="Ej: Hermano, Padre, Tío" required>
+        <span class="err-msg">Obligatorio.</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="refFamTel">Teléfono <span class="req">*</span></label>
+        <input type="tel" id="refFamTel" name="refFamTel" placeholder="3101234567" required pattern="[0-9]{7,15}">
+        <span class="err-msg">Teléfono válido.</span>
+      </div>
+      <div class="field">
+        <label for="refFamCiudad">Ciudad <span class="req">*</span></label>
+        <input type="text" id="refFamCiudad" name="refFamCiudad" placeholder="Ej: Bogotá" required>
+        <span class="err-msg">Ciudad.</span>
+      </div>
+    </div>
+
+    <p style="font-size:12.5px;color:var(--muted);margin:14px 0 12px"><b>Referencia 2: Personal (Amigo/Conocido)</b></p>
+    <div class="row">
+      <div class="field">
+        <label for="refPerNombre">Nombre Completo <span class="req">*</span></label>
+        <input type="text" id="refPerNombre" name="refPerNombre" placeholder="Nombre de amigo o conocido" required>
+        <span class="err-msg">Obligatorio.</span>
+      </div>
+      <div class="field">
+        <label for="refPerRelacion">Relación / Conocido <span class="req">*</span></label>
+        <input type="text" id="refPerRelacion" name="refPerRelacion" placeholder="Ej: Amigo / Ex-compañero" required>
+        <span class="err-msg">Obligatorio.</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="refPerTel">Teléfono <span class="req">*</span></label>
+        <input type="tel" id="refPerTel" name="refPerTel" placeholder="3201234567" required pattern="[0-9]{7,15}">
+        <span class="err-msg">Teléfono válido.</span>
+      </div>
+      <div class="field">
+        <label for="refPerCiudad">Ciudad <span class="req">*</span></label>
+        <input type="text" id="refPerCiudad" name="refPerCiudad" placeholder="Ej: Cali" required>
+        <span class="err-msg">Ciudad.</span>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 6: FIRMA DIGITAL Y AUTORIZACIÓN LEY 1581 DE 2012 -->
+    <div class="section-title">
+      <span class="section-number">6</span>
+      Autorización y Firma Digital (Ley 1581 de 2012)
+    </div>
+
+    <div class="ley-box">
+      <b>AUTORIZACIÓN DE TRATAMIENTO DE DATOS PERSONALES Y CONSULTA EN CENTRALES DE RIESGO:</b><br>
+      De conformidad con la Ley Estatutaria 1581 de 2012 de Colombia y sus decretos reglamentarios, declaro que la información suministrada en esta solicitud es veraz y fidedigna. Autorizo de manera previa, expresa e informada al asesor y a las entidades bancarias aliadas para consultar, reportar, procesar y almacenar mi información financiera y crediticia ante las centrales de riesgo (DataCrédito, CIFIN/TransUnion).
+    </div>
+
+    <div class="field">
+      <label>Firme a continuación con el mouse o la pantalla táctil <span class="req">*</span></label>
+      <div class="signature-container" id="sigContainer">
+        <canvas id="sigCanvas"></canvas>
+      </div>
+      <span class="err-msg" id="sigError">Por favor dibuje su firma en el cuadro antes de enviar.</span>
+    </div>
+
+    <div class="signature-tools">
+      <button type="button" id="btnClearSig">Limpiar Firma</button>
+      <span style="font-size:12px;color:var(--muted);font-weight:600">✓ Tu firma se guardará automáticamente en un PDF seguro.</span>
+    </div>
+
+    <button type="submit" id="submitBtn">Enviar Solicitud al Banco</button>
+    <div class="form-status" id="formStatus"></div>
+
+  </form>
+
+  <footer>© 2026 Créditos Vehiculares S.A.S. — Todos los derechos reservados.</footer>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-box">
+    <div class="modal-icon">✓</div>
+    <h3>¡Solicitud Enviada con Éxito!</h3>
+    <p>Hemos registrado tu solicitud bancaria detallada y almacenado tu documento de firma en PDF. Un asesor revisará tu radicación a la brevedad.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-whatsapp" id="btnModalWa">Continuar a WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Configuración de endpoints y constantes
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4TkISKEjjFPZNpXTw1Ebfa4VQdfSGSxZXqY_py3lszgmczXdl8RsTVTJl1bvQpoDv3A/exec";
+const WHATSAPP_NUMBER = "573182754224";
+
+const form = document.getElementById('detailedCreditForm');
+const submitBtn = document.getElementById('submitBtn');
+const formStatus = document.getElementById('formStatus');
+
+// Canvas de Firma Digital
+const canvas = document.getElementById('sigCanvas');
+const ctx = canvas.getContext('2d');
+let isDrawing = false;
+let hasSignature = false;
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#1c2e4a';
+}
+window.addEventListener('load', resizeCanvas);
+window.addEventListener('resize', resizeCanvas);
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  let clientX = e.clientX;
+  let clientY = e.clientY;
+  if (e.touches && e.touches.length > 0) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  }
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top
+  };
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  hasSignature = true;
+  document.getElementById('sigContainer').classList.remove('has-error');
+  document.getElementById('sigError').style.display = 'none';
+  const pos = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(pos.x, pos.y);
+  if (e.type === 'touchstart') e.preventDefault();
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const pos = getPos(e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.stroke();
+  if (e.type === 'touchmove') e.preventDefault();
+}
+
+function stopDrawing() {
+  isDrawing = false;
+}
+
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseleave', stopDrawing);
+
+canvas.addEventListener('touchstart', startDrawing, {passive: false});
+canvas.addEventListener('touchmove', draw, {passive: false});
+canvas.addEventListener('touchend', stopDrawing);
+
+document.getElementById('btnClearSig').addEventListener('click', () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  hasSignature = false;
+});
+
+// Generador de PDF provisional con jsPDF (contiene la firma conforme requerimiento)
+function generateSignaturePdf() {
+  if (!hasSignature) {
+    alert("Por favor dibuje su firma antes de generar el documento PDF.");
+    return null;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Se genera el PDF enfocado en la firma provisional del usuario conforme Ley 1581
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(28, 46, 74);
+  doc.text("DOCUMENTO PROVISIONAL DE FIRMA", 105, 25, { align: "center" });
+
+  doc.setFontSize(11);
+  doc.setTextColor(55, 67, 135);
+  doc.text("AUTORIZACIÓN LEY ESTATUTARIA 1581 DE 2012", 105, 33, { align: "center" });
+
+  doc.setLineWidth(0.5);
+  doc.setDrawColor(200, 200, 200);
+  doc.line(20, 40, 190, 40);
+
+  // Recuadro exclusivo para la firma digital
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(40, 40, 40);
+  doc.text("FIRMA DEL TITULAR", 105, 55, { align: "center" });
+  doc.rect(25, 65, 160, 90);
+
+  // Insertar trazado de firma desde canvas
+  const sigImgData = canvas.toDataURL('image/png');
+  doc.addImage(sigImgData, 'PNG', 30, 70, 150, 80);
+
+  return doc;
+}
+
+document.getElementById('btnPreviewPdf').addEventListener('click', () => {
+  const doc = generateSignaturePdf();
+  if (doc) {
+    const docNum = document.getElementById('numDoc').value || 'provisional';
+    doc.save(`Firma_Ley1581_${docNum}.pdf`);
+  }
+});
+
+// Módulo de búsqueda y autocompletado desde Google Sheets
+const searchNumDocInput = document.getElementById('searchNumDoc');
+const btnBuscarDoc = document.getElementById('btnBuscarDoc');
+const searchFeedback = document.getElementById('searchFeedback');
+
+btnBuscarDoc.addEventListener('click', async () => {
+  const numDocVal = searchNumDocInput.value.trim();
+  if (!numDocVal) {
+    searchFeedback.className = 'search-feedback error';
+    searchFeedback.textContent = 'Por favor ingresa un número de documento para buscar.';
+    return;
+  }
+
+  btnBuscarDoc.disabled = true;
+  btnBuscarDoc.textContent = 'Buscando...';
+  searchFeedback.style.display = 'none';
+
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?numDoc=${encodeURIComponent(numDocVal)}`);
+    const data = await res.json();
+
+    if (data.result === 'found' && data.lead) {
+      const lead = data.lead;
+
+      if (lead.nombre) document.getElementById('nombre').value = lead.nombre;
+      if (lead.tipoDoc) document.getElementById('tipoDoc').value = lead.tipoDoc;
+      if (lead.numDoc) document.getElementById('numDoc').value = lead.numDoc;
+      if (lead.telefono) document.getElementById('telefono').value = lead.telefono;
+      if (lead.email) document.getElementById('email').value = lead.email;
+      if (lead.edad) document.getElementById('edad').value = lead.edad;
+      if (lead.monto) document.getElementById('monto').value = lead.monto;
+      if (lead.ingresos) document.getElementById('ingresos').value = lead.ingresos;
+
+      if (lead.vehiculo) {
+        if (lead.vehiculo.toLowerCase().includes('moto')) {
+          document.getElementById('vehMoto').checked = true;
+        } else {
+          document.getElementById('vehCarro').checked = true;
+        }
+      }
+
+      if (lead.ocupacion) {
+        const ocupSelect = document.getElementById('tipoContrato');
+        if (lead.ocupacion.includes('Empleado')) ocupSelect.value = 'Término Indefinido';
+        else if (lead.ocupacion.includes('Independiente')) ocupSelect.value = 'Independiente / Comerciante';
+        else if (lead.ocupacion.includes('Pensionado')) ocupSelect.value = 'Pensionado';
+      }
+
+      searchFeedback.className = 'search-feedback success';
+      searchFeedback.textContent = `✓ ¡Datos encontrados y autocompletados para ${lead.nombre}!`;
+    } else {
+      searchFeedback.className = 'search-feedback error';
+      searchFeedback.textContent = 'No se encontraron datos previos con este documento. Puedes llenar el formulario manualmente.';
+    }
+  } catch (err) {
+    console.error('Error buscando datos:', err);
+    searchFeedback.className = 'search-feedback error';
+    searchFeedback.textContent = 'Ocurrió un error al consultar los datos. Por favor llena el formulario manualmente.';
+  } finally {
+    btnBuscarDoc.disabled = false;
+    btnBuscarDoc.textContent = 'Cargar mis datos';
+  }
+});
+
+// Validación en tiempo real
+function validateField(field) {
+  const wrapper = field.closest('.field');
+  if (!wrapper) return field.checkValidity();
+  const valid = field.checkValidity();
+  wrapper.classList.toggle('has-error', !valid);
+  field.classList.toggle('invalid', !valid);
+  return valid;
+}
+
+form.querySelectorAll('input, select, textarea').forEach(el => {
+  el.addEventListener('blur', () => validateField(el));
+  el.addEventListener('input', () => { if (el.classList.contains('invalid')) validateField(el); });
+});
+
+// Envío del formulario
+form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  formStatus.style.display = 'none';
+
+  let allValid = true;
+  form.querySelectorAll('input, select, textarea').forEach(el => {
+    if (!validateField(el)) allValid = false;
+  });
+
+  if (!hasSignature) {
+    allValid = false;
+    document.getElementById('sigContainer').classList.add('has-error');
+    document.getElementById('sigError').style.display = 'block';
+  }
+
+  if (!allValid) {
+    const firstError = form.querySelector('.invalid, .has-error input, .has-error select, .signature-container.has-error');
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const payload = {
+    tipoFormulario: 'detallado',
+    nombre: form.nombre.value.trim(),
+    tipoDoc: form.tipoDoc.value,
+    numDoc: form.numDoc.value.trim(),
+    fechaExpDoc: form.fechaExpDoc.value,
+    lugarExpDoc: form.lugarExpDoc.value.trim(),
+    fechaNacimiento: form.fechaNacimiento.value,
+    edad: form.edad.value,
+    estadoCivil: form.estadoCivil.value,
+    nivelEstudios: form.nivelEstudios.value,
+    personasACargo: form.personasACargo.value,
+    telefono: form.telefono.value.trim(),
+    email: form.email.value.trim(),
+    direccionResidencia: form.direccionResidencia.value.trim(),
+    ciudad: form.ciudad.value.trim(),
+    departamento: form.departamento.value.trim(),
+    tipoVivienda: form.tipoVivienda.value,
+    tiempoResidencia: form.tiempoResidencia.value,
+    valorViviendaCanon: form.valorViviendaCanon.value || '0',
+    tipoContrato: form.tipoContrato.value,
+    empresa: form.empresa.value.trim(),
+    cargo: form.cargo.value.trim(),
+    fechaVinculacion: form.fechaVinculacion.value,
+    telefonoEmpresa: form.telefonoEmpresa.value.trim(),
+    direccionEmpresa: form.direccionEmpresa.value.trim(),
+    ingresos: form.ingresos.value,
+    otrosIngresos: form.otrosIngresos.value || '0',
+    conceptoOtrosIngresos: form.conceptoOtrosIngresos.value.trim() || 'N/A',
+    egresos: form.egresos.value,
+    vehiculo: form.vehiculo.value,
+    estadoVehiculo: form.estadoVehiculo.value,
+    marcaVehiculo: form.marcaVehiculo.value.trim(),
+    lineaVehiculo: form.lineaVehiculo.value.trim(),
+    modeloVehiculo: form.modeloVehiculo.value,
+    monto: form.monto.value,
+    cuotaInicial: form.cuotaInicial.value || '0',
+    refFamNombre: form.refFamNombre.value.trim(),
+    refFamParentesco: form.refFamParentesco.value.trim(),
+    refFamTel: form.refFamTel.value.trim(),
+    refFamCiudad: form.refFamCiudad.value.trim(),
+    refPerNombre: form.refPerNombre.value.trim(),
+    refPerRelacion: form.refPerRelacion.value.trim(),
+    refPerTel: form.refPerTel.value.trim(),
+    refPerCiudad: form.refPerCiudad.value.trim(),
+    firmaRegistrada: true,
+    firmaBase64: canvas.toDataURL('image/png')
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando Solicitud al Banco...';
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) {
+    console.error('Error al guardar en Sheets:', err);
+  }
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Enviar Solicitud Detallada al Banco';
+
+  // Mostrar modal de confirmación
+  const modal = document.getElementById('resultModal');
+  modal.classList.add('show');
+
+  document.getElementById('btnModalWa').onclick = () => {
+    const mensaje = `Hola, mi nombre es ${payload.nombre} con documento ${payload.numDoc}. He completado la solicitud bancaria detallada para el crédito vehicular y envié mi firma autorizada.`;
+    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+  };
+});
+</script>
+</body>
+</html>
