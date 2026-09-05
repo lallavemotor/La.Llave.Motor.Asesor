@@ -20,10 +20,11 @@ Los datos de ambas páginas se gestionan centralizadamente en un mismo libro de 
 ## Funcionalidades Clave
 
 ### 1. Formulario Inicial (`index.html`)
+- Identidad de marca **La Llave Motor** con contenedor de logo.
 - Captación rápida de datos personales y financieros básicos.
 - Evaluación automática de viabilidad en cliente (Ingresos > $2.700.000 + Demuestra ingresos).
 - Redirección automática a WhatsApp.
-- Enlace directo al formulario detallado para usuarios interesados en agilizar el trámite.
+- Botón flotante de ayuda directa por WhatsApp ("Hola, necesito ayuda de un asesor").
 
 ### 2. Formulario Detallado Bancario (`solicitud-detallada.html`)
 - **Autocompletado con Google Sheets:** Al ingresar el número de documento en la barra de búsqueda superior y hacer clic en "Cargar mis datos", la página consulta a Apps Script (`doGet?numDoc=...`) y completa automáticamente los campos recopilados previamente.
