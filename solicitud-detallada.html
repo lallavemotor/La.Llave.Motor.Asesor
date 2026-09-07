@@ -724,51 +724,7 @@ document.getElementById('btnClearSig').addEventListener('click', () => {
   hasSignature = false;
 });
 
-// Generador de PDF provisional con jsPDF (contiene la firma conforme requerimiento)
-function generateSignaturePdf() {
-  if (!hasSignature) {
-    alert("Por favor dibuje su firma antes de generar el documento PDF.");
-    return null;
-  }
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  // Se genera el PDF enfocado en la firma provisional del usuario conforme Ley 1581
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.setTextColor(28, 46, 74);
-  doc.text("DOCUMENTO PROVISIONAL DE FIRMA", 105, 25, { align: "center" });
-
-  doc.setFontSize(11);
-  doc.setTextColor(55, 67, 135);
-  doc.text("AUTORIZACIÓN LEY ESTATUTARIA 1581 DE 2012", 105, 33, { align: "center" });
-
-  doc.setLineWidth(0.5);
-  doc.setDrawColor(200, 200, 200);
-  doc.line(20, 40, 190, 40);
-
-  // Recuadro exclusivo para la firma digital
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(40, 40, 40);
-  doc.text("FIRMA DEL TITULAR", 105, 55, { align: "center" });
-  doc.rect(25, 65, 160, 90);
-
-  // Insertar trazado de firma desde canvas
-  const sigImgData = canvas.toDataURL('image/png');
-  doc.addImage(sigImgData, 'PNG', 30, 70, 150, 80);
-
-  return doc;
-}
-
-document.getElementById('btnPreviewPdf').addEventListener('click', () => {
-  const doc = generateSignaturePdf();
-  if (doc) {
-    const docNum = document.getElementById('numDoc').value || 'provisional';
-    doc.save(`Firma_Ley1581_${docNum}.pdf`);
-  }
-});
 
 // Módulo de búsqueda y autocompletado desde Google Sheets
 const searchNumDocInput = document.getElementById('searchNumDoc');
