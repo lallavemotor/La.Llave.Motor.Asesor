@@ -70,7 +70,7 @@ Los datos de ambas páginas se gestionan centralizadamente en un mismo libro de 
 ---
 
 ## Configuración Actual
-- **APPS_SCRIPT_URL:** `https://script.google.com/macros/s/AKfycby4TkISKEjjFPZNpXTw1Ebfa4VQdfSGSxZXqY_py3lszgmczXdl8RsTVTJl1bvQpoDv3A/exec`
+- **APPS_SCRIPT_URL:** `https://script.google.com/macros/s/AKfycbwX7uwh_GlLPVl-uXsnZqr3TxB1ezAsLPTsIuJ6BHwTfDRoYyiYgcdE_VFgIDXEBtrXgQ/exec`
 - **WHATSAPP_NUMBER:** `573182754224`
 
 ---
