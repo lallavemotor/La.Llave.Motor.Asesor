@@ -293,7 +293,7 @@ footer{text-align:center;margin-top:30px;color:var(--muted);font-size:11.5px;fon
     </div>
 
     <div class="field">
-      <label for="demuestraIngresos">¿Tiene manera de demostrar sus ingresos? <span class="req">*</span></label>
+      <label for="demuestraIngresos">¿Cuenta con documentos para sustentar sus ingresos? <span class="req">*</span></label>
       <select id="demuestraIngresos" name="demuestraIngresos" required>
         <option value="">Selecciona una opción</option>
         <option value="Sí">Sí</option>
@@ -306,9 +306,9 @@ footer{text-align:center;margin-top:30px;color:var(--muted);font-size:11.5px;fon
       <label for="obligaciones">¿Cuenta con obligaciones financieras? <span class="req">*</span></label>
       <select id="obligaciones" name="obligaciones" required>
         <option value="">Selecciona una opción</option>
-        <option value="Sí tengo y están al día">Sí tengo y están al día</option>
-        <option value="Sí tengo y están reportadas en centrales">Sí tengo y están reportadas en centrales</option>
-        <option value="No tengo">No tengo</option>
+        <option value="Sí, tengo obligaciones financieras y me encuentro al día.">Sí, tengo obligaciones financieras y me encuentro al día.</option>
+        <option value="Sí, tengo obligaciones financieras y presento reportes en centrales de riesgo.">Sí, tengo obligaciones financieras y presento reportes en centrales de riesgo.</option>
+        <option value="No, actualmente no tengo obligaciones financieras.">No, actualmente no tengo obligaciones financieras.</option>
       </select>
       <span class="err-msg">Selecciona una opción.</span>
     </div>
@@ -404,7 +404,7 @@ const pazYSalvoField = document.getElementById('pazYSalvoField');
 const pazYSalvoSelect = document.getElementById('pazYSalvo');
 
 obligacionesSelect.addEventListener('change', ()=>{
-  const mostrar = obligacionesSelect.value === 'Sí tengo y están reportadas en centrales';
+  const mostrar = obligacionesSelect.value.includes('reportes');
   pazYSalvoField.style.display = mostrar ? 'block' : 'none';
   pazYSalvoSelect.required = mostrar;
   if(!mostrar){
@@ -441,6 +441,7 @@ form.addEventListener('submit', async function(e){
 
   // Recolectar datos
   const data = {
+    tipoFormulario: 'inicial',
     nombre: form.nombre.value.trim(),
     tipoDoc: form.tipoDoc.value,
     numDoc: form.numDoc.value.trim(),
